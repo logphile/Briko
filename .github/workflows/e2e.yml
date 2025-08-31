@@ -17,5 +17,6 @@ jobs:
       - run: npx playwright install --with-deps
       - run: npm run serve:static &
       - run: npx wait-on http://localhost:4178
-      - env: { BASE_URL: "http://localhost:4178" }
+      - env:
+          BASE_URL: "http://localhost:4178"
         run: npm run e2e

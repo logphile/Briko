@@ -15,11 +15,11 @@ jobs:
         run: |
           f=AGENT_TASKS.md
           [ ! -f "$f" ] && echo -e "# Agent Tasks (source of truth)\n\n## Queue\n\n## Done" > "$f"
-          esc_title=$(printf "%s" "${{ github.event.issue.title }} — ${{ github.event.issue.html_url }}" | sed 's/`/\\`/g')
-          esc_body=$(printf "%s" "${{ github.event.issue.body }}" | sed 's/`/\\`/g')
+          esc_title="$(printf "%s" "${{ github.event.issue.title }} — ${{ github.event.issue.html_url }}" | sed 's/`/\\`/g')"
+          esc_body="$(printf "%s" "${{ github.event.issue.body }}" | sed 's/`/\\`/g')"
           ins="- [ ] ${esc_title}\n\n${esc_body}\n"
           awk -v ins="$ins" 'BEGIN{p=0} /^## Queue/ && !p {print; print ins; p=1; next} {print}' "$f" > "$f.tmp" && mv "$f.tmp" "$f"
-      - name: Commit
+      - name: Commit queue update
         run: |
           git config user.name "windsurf-relay"
           git config user.email "actions@users.noreply.github.com"

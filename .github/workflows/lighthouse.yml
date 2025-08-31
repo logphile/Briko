@@ -12,8 +12,8 @@ jobs:
       - run: npm run serve:static &
       - run: npx wait-on http://localhost:4178
       - run: |
-          npx lhci autorun ^
-            --collect.url=http://localhost:4178/ ^
-            --collect.url=http://localhost:4178/mosaic ^
-            --assert.assertions.performance=off ^
+          npx lhci autorun \
+            --collect.url=http://localhost:4178/ \
+            --collect.url=http://localhost:4178/mosaic \
+            --assert.assertions.performance=off \
             --assert.assertions."categories:performance">=0.85
