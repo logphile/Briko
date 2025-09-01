@@ -5,6 +5,7 @@ on:
 permissions:
   contents: write
   issues: write
+  pull-requests: write
 jobs:
   enqueue:
     if: github.event.issue.state == 'open' && contains(github.event.issue.labels.*.name, 'windsurf')
@@ -19,15 +20,17 @@ jobs:
           esc_body="$(printf "%s" "${{ github.event.issue.body }}" | sed 's/`/\\`/g')"
           ins="- [ ] ${esc_title}\n\n${esc_body}\n"
           awk -v ins="$ins" 'BEGIN{p=0} /^## Queue/ && !p {print; print ins; p=1; next} {print}' "$f" > "$f.tmp" && mv "$f.tmp" "$f"
-      - name: Commit queue update
-        run: |
-          git config user.name "windsurf-relay"
-          git config user.email "actions@users.noreply.github.com"
-          git add AGENT_TASKS.md
-          git commit -m "chore(windsurf): enqueue task from #${{ github.event.issue.number }}" || true
-          git push
+      - name: Open PR for queue update
+        uses: peter-evans/create-pull-request@v6
+        with:
+          add-paths: AGENT_TASKS.md
+          branch: ws-queue/${{ github.event.issue.number }}
+          commit-message: "chore(queue): enqueue #${{ github.event.issue.number }}"
+          title: "chore(queue): enqueue #${{ github.event.issue.number }}"
+          body: "Auto-generated from issue."
+          labels: automerge
       - uses: actions-ecosystem/action-add-comment@v1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          body: "Queued in **AGENT_TASKS.md**. Windsurf will pick it up."
+          body: "Queued in **AGENT_TASKS.md** via PR. Windsurf will pick it up."
       - uses: peter-evans/close-issue@v3
