@@ -32,3 +32,5 @@ export default defineNuxtConfig({
     }
   }
 })
+
+this is not js
